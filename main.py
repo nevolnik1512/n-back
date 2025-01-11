@@ -3,7 +3,7 @@ import random
 import pygame
 
  
- 
+
 # pygame setup
 pygame.init()
 fps=60
@@ -21,7 +21,7 @@ theme_font = pygame.font.SysFont('DejaVu Sans Mono', 30)
 #game set up
 theme_color="white"
 cell_size=150#one side size
-back=2#steps back to remember
+back=3#steps back to remember
 queue=[i for i in range(back)]#history of positions
 press=False
 round=fps * 2 # seconds
