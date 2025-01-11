@@ -1,0 +1,1 @@
+This is a usual game for memory training n-back. It is made by pygame and controlled by keyboard
