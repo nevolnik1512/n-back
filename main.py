@@ -12,8 +12,13 @@ cx=screen.get_width()/2#screen center x position
 cy=screen.get_height()/2#screen center y position
 clock = pygame.time.Clock()
 running = True
+pause=True
+pausecldwn=10
 bullet_pos=pygame.Vector2(screen.get_width()/3,screen.get_height()/3)
 theme_font = pygame.font.SysFont('DejaVu Sans Mono', 30)
+mess_font = pygame.font.SysFont('DejaVu Sans Mono', 50)
+messx=700
+messy=300
 
 
 
@@ -50,7 +55,11 @@ while running:
             
             if i < len(queue)-1:#shifting all elements to the right on one
                 queue[i+1]=queue[i]
-        queue[0]=random.randint(0,8)
+        if random.randint(0,3)==0:
+            queue[0]=queue[-1]
+        else:
+            while queue [0]==queue[-1]:
+                queue[0]=random.randint(0,8)
             
 
     #rendering grid
@@ -59,7 +68,12 @@ while running:
 
     messages=['N='+str(back-1),
             'Score='+str(score),
-            'Health='+str(health)]
+            'Health='+str(health),
+            '',
+            'To pause press p',
+            'To escape press ESC',
+            'To catch a ball',
+            'press Space']
     for i in range(len(messages)):
         text_surface = theme_font.render(messages[i], False, (255, 255, 255))
         screen.blit(text_surface, (0,30*i))
@@ -96,6 +110,15 @@ while running:
             
         pygame.draw.circle(screen, bullet_color, bullet_pos, 40)
 
+    #rendering message
+    if pause:
+        pygame.draw.rect(screen,"white",(cx-messx/2,cy-messy/2,messx,messy))
+        pygame.draw.rect(screen,"black",(cx-(messx-10)/2,cy-(messy-10)/2,messx-10,messy-10))
+
+        text_surface = mess_font.render("Paused", False, (255, 255, 255))
+        screen.blit(text_surface, (cx-len("Paused")/2*28,cy-80))
+        text_surface = mess_font.render("Press p to resume", False, (255, 255, 255))
+        screen.blit(text_surface, (cx-len("Press p to resume")/2*28,cy))
 
 
     #getting users pressions
@@ -107,16 +130,21 @@ while running:
             else:
                 health -=1
             press=True
+        if keys[pygame.K_p] and pausecldwn<=0:
+            pause=not pause
+            pausecldwn=10
     if keys[pygame.K_ESCAPE]:
         running=False
 
     if health <= 0:
         running=False
-        
-    tleft-=1
+    
+    if not pause:
+        tleft-=1
     if tleft <= 0:
         tleft = round
 
+    pausecldwn-=1
 
 
     
