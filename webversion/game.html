@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- Оболочка документа, указываем язык содержимого -->
+<html lang="en">
+	<!-- Заголовок страницы, контейнер для других важных данных (не отображается) -->
+	<head>
+		<!-- Заголовок страницы в браузере -->
+		<title>Manual</title>
+		<!-- Подключаем CSS -->
+		<link rel="stylesheet" href="css/style.css" />
+		<!-- Кодировка страницы -->
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+
+		
+
+	</head>
+	<!-- Отображаемое тело страницы -->
+	<body style="background-color: black;">
+        <h2>N-BACK</h2>
+		<canvas id ="field" height="500px" width="1500px" style="border:1px solid #ffffff;">HTML canvas don't support</canvas>
+
+
+		<script>
+			//draw grid 
+			var button= {
+				x:10,
+				y:10,
+				height:10,
+				width:10,
+			};
+			function field (){
+				var c = document.getElementById("field");
+				var ctx = c.getContext("2d");
+				var theme = "red"
+				var xc=1500/2
+				var size = 150
+				var x0=xc-size*1.5
+				var y0= 10
+				ctx.moveTo(x0, y0);
+				for (let i =0; i <= 3; i++)
+				{
+					ctx.moveTo(x0+i*size, y0);
+					ctx.lineTo(x0+i*size,y0+3*size)
+					ctx.strokeStyle = theme;
+					ctx.lineWidth = 5;
+					ctx.stroke();
+				}
+				for (let i =0; i <= 3; i++)
+				{
+					ctx.moveTo(x0, y0+i*size);
+					ctx.lineTo(x0+3*size,y0+i*size)
+					ctx.strokeStyle = theme;
+					ctx.lineWidth = 5;
+					ctx.stroke();
+				}
+			}
+
+
+			//
+
+		</script>
+		<br/>
+		<a href="index.html">
+			<img src="img/back-button.png" alt="there is no button" style="width: 400px;height: 200px;">
+		</a>
+
+		
+    </body>
+</html>

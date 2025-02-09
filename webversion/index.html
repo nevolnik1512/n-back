@@ -1,1 +1,53 @@
-<html></html>
+<!-- Сообщаем браузеру как стоит обрабатывать эту страницу -->
+<!DOCTYPE html>
+<!-- Оболочка документа, указываем язык содержимого -->
+<html lang="en">
+	<!-- Заголовок страницы, контейнер для других важных данных (не отображается) -->
+	<head>
+		<!-- Заголовок страницы в браузере -->
+		<title>Welcome</title>
+		<!-- Подключаем CSS -->
+		<link rel="stylesheet" href="css/style.css" />
+		<!-- Кодировка страницы -->
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+	</head>
+	<!-- Отображаемое тело страницы -->
+	<body style="background-color: black;">
+		<h1>Welcome to our browser game N-back</h1>
+
+
+		<!--Button to play-->
+		<p class="toplay">
+			You could play this game by clicking this button, but now it doesn't work. Here should be a picture
+		</p>
+		<br/>
+		<br/>
+		<a href="game.html">
+			<img src="img/play-button.png" alt="button's picture is lost" style="width:400px;height:400px;">
+		</a>
+		
+
+		<!--Information about the project-->
+		<h2>About the project</h2>
+
+		<!--manual-->
+		<p style="text-align: left;">
+			There are manual for our game. I hope that this will help :))
+			<br/>
+			<br/>
+			<a href="manual.html">
+				<img src="img/manual-button.png" alt="button is not here" style="width:400;height:200px;">
+			</a>
+		</p>
+		<!--author-->
+		<p style="text-align: right;">
+			Here you can look for info about creator.
+			<br/>
+			<br/>
+			<a href="author.html">
+				<img src="img/author-button.png" alt="button is not here" style="width:400;height:200px;">
+			</a>
+		</p>
+	</body>
+</html>
