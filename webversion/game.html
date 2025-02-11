@@ -22,48 +22,336 @@
 
 		<script>
 			//draw grid 
-			var button= {
-				x:10,
-				y:10,
-				height:10,
-				width:10,
-			};
-			function field (){
-				var c = document.getElementById("field");
-				var ctx = c.getContext("2d");
-				var theme = "red"
-				var xc=1500/2
-				var size = 150
-				var x0=xc-size*1.5
-				var y0= 10
-				ctx.moveTo(x0, y0);
-				for (let i =0; i <= 3; i++)
-				{
-					ctx.moveTo(x0+i*size, y0);
-					ctx.lineTo(x0+i*size,y0+3*size)
-					ctx.strokeStyle = theme;
-					ctx.lineWidth = 5;
-					ctx.stroke();
-				}
-				for (let i =0; i <= 3; i++)
-				{
-					ctx.moveTo(x0, y0+i*size);
-					ctx.lineTo(x0+3*size,y0+i*size)
-					ctx.strokeStyle = theme;
-					ctx.lineWidth = 5;
-					ctx.stroke();
-				}
+			var c = document.getElementById("field");
+			const xdis=1500//canvas size
+			const ydis=500//canvas size
+			var ctx = c.getContext("2d");//pen
+			const theme = "#bc58ff";//colour
+			const xc=xdis/2;//x center of canvas
+			const size = 150;//size of one cell in a grid
+			const fonttheme= "DejaVu Sans Mono";
+			const fontsize = 50;//px
+			const fps=100;
+			
+			
+			var tried=false
+			var levelup=false
+			var pause=false
+			var right=false
+			var cooldown=true
+			var round=2//seconds
+			var dot;//dot's position
+			var n=1;
+			var hist=new Array(n+1)
+			var hp=10
+			var xp=0
+			var time=1
+			var timelost=1
+
+			for (let i =0; i < n; i++){
+				hist[i]=-1
 			}
 
+
+			//object button
+			class button {
+				constructor(x,y,width,height,text){
+					this.x=x;
+					this.y=y;
+					this.height=height;
+					this.width=width;
+					this.text=text;
+					this.clicked=false;
+				}
+				draw (){
+					ctx.beginPath();
+					ctx.moveTo(this.x,this.y);
+					ctx.lineWidth = 5;
+					ctx.strokeStyle=theme;
+					ctx.fillStyle=theme;
+					if (this.clicked){
+						ctx.strokeStyle="white"
+						ctx.fillStyle="white"
+					}
+					ctx.rect(this.x,this.y,this.width,this.height);
+					ctx.stroke();
+
+					//text write
+					ctx.moveTo(this.x,this.y);
+					ctx.font=fontsize+"px "+fonttheme;
+					
+					ctx.fillText(this.text,this.x+size-25*3,this.y+0.5*size+20);
+					
+					ctx.stroke();
+					this.clicked=false;
+
+				}
+				iscatched(pos) { 
+  					var cl =pos.x > this.x && pos.x < this.x + this.width && pos.y < this.y + this.height && pos.y > this.y
+					var realtime = getrealtime()
+					
+					this.clicked=true
+					
+				
+					return this.clicked
+				}
+			}
+			
+
+			//showing field
+			function field (){
+				
+				var x0=xc-size*1.5;
+				var y0= 10;
+				ctx.beginPath();
+				ctx.moveTo(x0, y0);
+				if (levelup){
+					ctx.strokeStyle="green"
+					levelup=false
+				}else{
+					ctx.strokeStyle = theme;//colour
+				}
+				ctx.lineWidth = 5;//wall thickness
+				for (let i =0; i <= 3; i++){
+					ctx.moveTo(x0+i*size, y0);
+					ctx.lineTo(x0+i*size,y0+3*size);
+					ctx.stroke();
+				}
+				for (let i =0; i <= 3; i++){
+					ctx.moveTo(x0, y0+i*size);
+					ctx.lineTo(x0+3*size,y0+i*size);
+					ctx.stroke();
+				}
+
+			}
+
+
+			//showing dot
+			function drawdot(){
+				var x0 = xc-size;//the first position x
+				var y0 = 10+size/2;//the first position y
+
+				x0+=(dot%3)*size;
+				y0+=(dot-(dot%3))/3*size;
+
+				ctx.beginPath();
+				if (!tried){
+					ctx.fillStyle = theme;
+				}
+				else{
+					if (right) {ctx.fillStyle = "green"}
+					else {ctx.fillStyle = "red"}
+				}
+				ctx.arc(x0, y0, size/3, 0, 2 * Math.PI);
+				
+
+				ctx.fill();
+			}
+
+
+
+			//thing that shows ticks of rounds
+			function drawbar(){
+				var lx= 3*size
+
+				var timer = (gettime())%(round*1000)
+				var r= timer/round/1000*lx/2
+
+				var x0=xc-2.5*size
+				var y0=10+1.5*size-r
+				
+				ctx.beginPath();
+				ctx.strokeStyle=theme;
+				ctx.lineWidth=10;
+				ctx.moveTo(x0,y0);
+				ctx.lineTo(x0,y0+2*r);
+				ctx.stroke();
+
+				ctx.moveTo(x0-5,15);
+				ctx.lineTo(x0+5,15);
+				ctx.stroke();
+
+				ctx.moveTo(x0-5,10+lx);
+				ctx.lineTo(x0+5,10+lx);
+				ctx.stroke();
+
+				/*const grad=ctx.createRadialGradient(xc,ydis/2,2,xc,ydis/2,300-0.0001*(l*l));
+				grad.addColorStop(0,"violet");
+				grad.addColorStop(1,"black");
+
+				// Fill rectangle with gradient
+				ctx.fillStyle = grad;
+				ctx.fillRect(0,0,xdis,xdis);*/
+			}
+
+
+
+			function gettime(){
+				var realtime= new Date().getSeconds()*1000+new Date().getMilliseconds()
+				if (!pause){
+					if (realtime > timelost){
+						time = realtime-timelost
+					}else{
+						time = 59999-timelost+realtime
+					}
+				}else{
+					if (realtime > timelost){
+						timelost=realtime-time
+					}else{
+						timelost = 59999-time+realtime
+					}
+				}					
+
+				if (timelost>60000){
+					timelost= timelost%60000
+				}
+
+				
+				return time;
+			}
+
+			function getrealtime(){
+				return new Date().getSeconds()*1000+new Date().getMilliseconds();
+			}
+
+
+
+			//output hp and xp
+			function drawstats (){
+				var x0 = xc + 2.5*size;
+				var y0 = 10 + 0.5*size-40;
+				ctx.beginPath();
+				ctx.moveTo(x0,y0);
+				ctx.font=fontsize+"px "+fonttheme;
+				ctx.fillStyle=theme;
+				
+				var message="health:"
+				var stat = ""+hp
+				ctx.fillText(message,x0,y0);
+				ctx.fillText(stat,x0+catchbtn.width-25*stat.length,y0);
+
+				y0 += fontsize
+				message="score:"
+				stat = ""+xp
+				ctx.fillText(message,x0,y0);
+				ctx.fillText(stat,x0+catchbtn.width-25*stat.length,y0);
+
+				y0 += fontsize
+				message="n:"
+				stat = ""+n
+				ctx.fillText(message,x0,y0);
+				ctx.fillText(stat,x0+catchbtn.width-25*stat.length,y0);
+
+				ctx.stroke();
+			}
+
+			//catching event
+			function mousecatch( event) {
+				var rect = c.getBoundingClientRect();
+				return {
+					x: event.clientX - rect.left,
+					y: event.clientY - rect.top,
+				};
+			}
+
+			
+			
+
+			//clear everything
+			function erase(){
+				ctx.clearRect(0,0, xdis,ydis);
+			}
+
+
+
+			//repeating cycle
+			function frame(){
+				erase();
+				
+				drawbar();
+				field();
+				catchbtn.draw();
+				drawdot();
+				drawstats();
+				
+				//new generation
+				var stimer = Math.floor(gettime()/1000);//seconds
+				if (stimer%(round)==0 && cooldown){
+					cooldown = false;
+					tried=false
+					right=false
+
+					//shifting all elements
+					for (let i =hist.length-1; i>0; i--){
+						hist[i]=hist[i-1]
+					}
+
+					if (hist [hist.length-1] == -1){
+						dot=Math.floor(Math.random() * 9); //from 0 to 9
+					}
+					else {
+						if (Math.floor(Math.random() * 4)==0){
+							dot=hist[hist.length-1]
+						}
+						else{
+							dot=Math.floor(Math.random() * 9);
+						}
+					}
+					
+					hist[0]=dot
+					console.log(hist)
+				}
+				else if (stimer%(round)!=0){
+					cooldown =true;
+				}
+
+				//look for a mouseclick
+				c.addEventListener
+				('click', function(evt) 
+				{
+					var mousePos = mousecatch(evt);
+
+					//buttons processing
+					if (catchbtn.iscatched(mousePos)) {//catch
+						
+						if (hist[0]==hist[hist.length-1])
+						{right=true}
+
+						if (!tried){
+							if (right){
+								xp++;
+							}else{
+								hp--;
+							}
+						}
+						tried=true
+					}
+					
+				}, false);
+
+
+				//growing level
+				n=1+(xp-(xp%5))/5
+				while (hist.length<n+1){
+					levelup=true
+					hist.push(-1)
+				}
+				
+				
+			}
+			catchbtn= new button(xc+size*2.5, 10+1*size, 2*size, 0.75*size, "catch")
+			setInterval(frame,fps);
+			
 
 			//
 
 		</script>
 		<br/>
-		<a href="index.html">
-			<img src="img/back-button.png" alt="there is no button" style="width: 400px;height: 200px;">
-		</a>
-
+		<p style="padding-top: 0;;text-align: left;">
+			<a href="index.html">
+				<img src="img/back-button.png" alt="there is no button" style="width: 400px;height: 200px;">
+			</a>
+		</p>
 		
     </body>
 </html>
